@@ -20,7 +20,7 @@
   </form>
 </div>
 <script>
-const stripe=Stripe('pk_test_TU_PUBLISHABLE_KEY');
+const stripe=Stripe('pk_live_51U05rVJ3pN3YzoSq8ZxSkO5miXppPEW0sUdlIipdAVUdHY4tAb2GAOvcRhpygAXVemgeSxp8klqqRm1eT36u1lzj007P1IcKdA');
 const elements=stripe.elements(); const card=elements.create('card'); card.mount('#card-element');
 document.getElementById('form').onsubmit=async(e)=>{
   e.preventDefault(); const btn=document.getElementById('btn'); btn.disabled=true; btn.textContent='Procesando pago...';
