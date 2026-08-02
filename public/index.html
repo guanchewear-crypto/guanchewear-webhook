@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GuancheWear</title>
+<script src="https://js.stripe.com/v3/"></script>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;background:#f5f5f5;display:flex;justify-content:center;align-items:center;min-height:100vh}.card{background:#fff;max-width:500px;width:100%;padding:30px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.1)}h1{text-align:center;margin-bottom:20px;color:#222}label{display:block;margin-top:15px;font-weight:bold;color:#444}select,input,textarea{width:100%;padding:10px;margin-top:5px;border:1px solid #ddd;border-radius:6px;font-size:1em}button{width:100%;padding:14px;margin-top:20px;background:#0066ff;color:#fff;border:none;border-radius:6px;font-size:1.1em;cursor:pointer}button:hover{background:#0052cc}#card-element{border:1px solid #ddd;border-radius:6px;padding:10px;margin-top:5px}#msg{color:#d00;margin-top:10px;text-align:center}</style></head>
+<body><div class="card">
+  <h1>GuancheWear</h1><p style="text-align:center;color:#666">Tu diseño único, hecho realidad.</p>
+  <form id="form">
+    <label>Tipo de prenda</label>
+    <select name="product_type"><option value="t-shirt">Camiseta – 25 €</option><option value="hoodie">Sudadera – 35 €</option></select>
+    <label>Talla (EU)</label>
+    <select name="size"><option>S</option><option selected>M</option><option>L</option><option>XL</option><option>XXL</option></select>
+    <label>Describe tu diseño</label>
+    <textarea name="description" rows="3" required placeholder="Ej: un gato astronauta con gafas retro, colores vivos..."></textarea>
+    <label>Tu email (para seguimiento)</label>
+    <input type="email" name="email" required value="guanchewear@gmail.com">
+    <div id="card-element"></div>
+    <button type="submit" id="btn">Pagar y generar diseño</button>
+    <p id="msg"></p>
+  </form>
+</div>
+<script>
+const stripe=Stripe('pk_test_TU_PUBLISHABLE_KEY');
+const elements=stripe.elements(); const card=elements.create('card'); card.mount('#card-element');
+document.getElementById('form').onsubmit=async(e)=>{
+  e.preventDefault(); const btn=document.getElementById('btn'); btn.disabled=true; btn.textContent='Procesando pago...';
+  const fd=new FormData(e.target); const data=Object.fromEntries(fd.entries());
+  try{
+    const r=await fetch('/api/crear-checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    const {id}=await r.json();
+    const {error}=await stripe.confirmCardPayment(id,{payment_method:{card,billing_details:{email:data.email}}});
+    if(error){document.getElementById('msg').textContent=error.message; btn.disabled=false; btn.textContent='Pagar y generar diseño'}
+  }catch(e){document.getElementById('msg').textContent='Error inesperado'; btn.disabled=false; btn.textContent='Pagar y generar diseño'}
+};
+</script></body></html>
