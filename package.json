@@ -4,7 +4,7 @@
   "description":"GuancheWear AI design generator + Printify integration",
   "main":"api/index.js",
   "license":"MIT",
-  "engines": {"node": "20.x"},
+  "engines": {"node": "24.x"},
   "dependencies":{
     "axios":"^1.7.2",
     "cors":"^2.8.5",
