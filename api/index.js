@@ -65,16 +65,24 @@ async function generarImagenes(prompt, n = 2) {
     model: 'gpt-image-1',
     prompt: prompt,
     n: n,
-    size: '1024x1024',
-    response_format: 'url'
+    size: '1024x1024'
   });
-  return response.data.map(img => img.url);
+  // gpt-image-1 returns base64, convert to data URL
+  return response.data.map(img => `data:image/png;base64,${img.b64_json}`);
 }
 
 // ─── Subir imagen a Printify ───
 
 async function subirAPrintify(imageUrl) {
-  const buf = (await axios.get(imageUrl, { responseType: 'arraybuffer' })).data;
+  let buf;
+  if (imageUrl.startsWith('data:')) {
+    // Handle base64 data URL
+    const base64 = imageUrl.split(',')[1];
+    buf = Buffer.from(base64, 'base64');
+  } else {
+    // Handle regular URL
+    buf = (await axios.get(imageUrl, { responseType: 'arraybuffer' })).data;
+  }
 
   const uploadResp = await axios.post(
     'https://api.printify.com/v1/uploads.json',
@@ -266,7 +274,7 @@ app.post('/api/crear-checkout', async (req, res) => {
         tipo: pedido.product_type,
         talla: pedido.size,
         color: pedido.color || '',
-        imagen: imagenElegida
+        imagen: 'data:,'  // Store image reference differently
       },
       success_url: `${req.headers.origin}/exito?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.origin}/diseno?token=${token}`
@@ -334,9 +342,6 @@ app.post('/api/webhook-stripe', async (req, res) => {
           <div style="font-family:Arial;max-width:600px;margin:0 auto;">
             <h1 style="color:#D4A853;">¡Gracias por tu compra! 🎉</h1>
             <p>Tu diseño único ha sido enviado a producción.</p>
-            <div style="text-align:center;margin:20px 0;">
-              <img src="${imagenUrl}" alt="Tu diseño" style="max-width:300px;border-radius:8px;border:2px solid #D4A853;">
-            </div>
             <p><strong>Número de pedido:</strong> GW${token.slice(0, 8)}</p>
             <p><strong>Producto:</strong> ${pedido.product_type === 'hoodie' ? 'Sudadera' : 'Camiseta'} - Talla ${pedido.size}</p>
             <p>Recibirás otro email con el número de seguimiento cuando se envíe.</p>
