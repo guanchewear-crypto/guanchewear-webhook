@@ -6,10 +6,11 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const OpenAI = require('openai');
 
+const path = require('path');
 const app = express();
 app.use(cors({ origin: process.env.CORS_ORIGIN || 'https://guanchewear.es' }));
 app.use(express.json({ limit: '5mb' }));
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
