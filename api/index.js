@@ -142,16 +142,18 @@ async function crearOrdenPrintify(variantId, fileId, email, externalId) {
   return orderResp.data.id;
 }
 
+const PUBLIC_DIR = path.join(__dirname, '..', 'public');
+
 // ─── Servir frontend ───
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/public/index.html');
+  res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
 });
 
 // ─── Página de diseño (post-pago) ───
 
 app.get('/diseno', (req, res) => {
-  res.sendFile(__dirname + '/public/diseno.html');
+  res.sendFile(path.join(PUBLIC_DIR, 'diseno.html'));
 });
 
 // ─── API: Crear diseño (SIN pago) ───
