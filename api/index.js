@@ -66,8 +66,7 @@ async function generarImagenes(prompt, n = 2) {
     prompt: prompt,
     n: n,
     size: '1024x1024',
-    quality: 'standard',
-    style: 'vivid'
+    quality: 'standard'
   });
   return response.data.map(img => img.url);
 }
