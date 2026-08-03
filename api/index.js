@@ -62,11 +62,11 @@ async function refinarPrompt(descripcion) {
 
 async function generarImagenes(prompt, n = 2) {
   const response = await openai.images.generate({
-    model: 'dall-e-3',
+    model: 'gpt-image-1',
     prompt: prompt,
     n: n,
     size: '1024x1024',
-    quality: 'standard'
+    response_format: 'url'
   });
   return response.data.map(img => img.url);
 }
