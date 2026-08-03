@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>GuancheWear — Crea tu diseño único</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0A0A0A;
+      --bg-card: #1A1A1A;
+      --bg-elevated: #242424;
+      --text: #F5F5F5;
+      --text-muted: #888;
+      --accent: #D4A853;
+      --accent-hover: #E8C06A;
+      --accent-glow: rgba(212,168,83,0.2);
+      --border: #333;
+      --error: #EF4444;
+      --success: #22C55E;
+      --radius: 16px;
+      --radius-sm: 8px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+    .container{max-width:1000px;margin:0 auto;padding:20px}
+    /* Header */
+    header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid var(--border);background:var(--bg)}
+    .logo{font-size:1.5rem;font-weight:800;letter-spacing:-0.03em;color:var(--text)}
+    .logo span{color:var(--accent)}
+    nav a{color:var(--text-muted);text-decoration:none;margin-left:24px;font-size:0.9rem;transition:color 0.2s}
+    nav a:hover{color:var(--accent)}
+    /* Steps */
+    .steps{display:flex;justify-content:center;gap:8px;padding:24px 0;max-width:600px;margin:0 auto}
+    .step{display:flex;align-items:center;gap:8px;opacity:0.3}
+    .step.active{opacity:1}
+    .step.completed{opacity:0.6;color:var(--accent)}
+    .step-num{width:28px;height:28px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600}
+    .step.completed .step-num{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+    .step-label{font-size:0.8rem;font-weight:500}
+    .step-connector{width:40px;height:2px;background:var(--border);align-self:center}
+    .step.completed ~ .step-connector{background:var(--accent)}
+    /* Form */
+    .form-section{background:var(--bg-card);border-radius:var(--radius);padding:32px;border:1px solid var(--border);margin-bottom:24px}
+    .form-section h2{font-size:1.2rem;font-weight:600;margin-bottom:20px;color:var(--text)}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .form-group{display:flex;flex-direction:column;gap:6px}
+    .form-group.full{grid-column:1/-1}
+    label{font-size:0.85rem;font-weight:500;color:var(--text-muted)}
+    select,input,textarea{
+      background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-sm);
+      color:var(--text);padding:12px 14px;font-size:0.95rem;font-family:inherit;
+      transition:border-color 0.2s,box-shadow 0.2s;outline:none
+    }
+    select:focus,input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+    textarea{resize:vertical;min-height:100px}
+    select option{background:var(--bg-card)}
+    .btn-primary{
+      background:linear-gradient(135deg,var(--accent),var(--accent-hover));color:var(--bg);
+      border:none;padding:14px 28px;border-radius:var(--radius-sm);font-size:1rem;font-weight:600;
+      cursor:pointer;transition:all 0.2s;width:100%;font-family:inherit
+    }
+    .btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 20px var(--accent-glow)}
+    .btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+    .btn-secondary{
+      background:transparent;color:var(--text);border:1px solid var(--border);
+      padding:12px 24px;border-radius:var(--radius-sm);font-size:0.9rem;font-weight:500;
+      cursor:pointer;transition:all 0.2s;font-family:inherit
+    }
+    .btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+    /* Design Gallery */
+    .design-gallery{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:20px 0}
+    .design-card{
+      background:var(--bg-elevated);border-radius:var(--radius);overflow:hidden;
+      border:2px solid var(--border);cursor:pointer;transition:all 0.2s;position:relative
+    }
+    .design-card:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,0.3)}
+    .design-card.selected{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow)}
+    .design-card img{width:100%;display:block}
+    .design-card .badge{
+      position:absolute;top:12px;left:12px;background:rgba(0,0,0,0.7);
+      padding:4px 10px;border-radius:20px;font-size:0.75rem;font-weight:500;color:var(--accent)
+    }
+    .design-card .check{
+      position:absolute;top:12px;right:12px;width:28px;height:28px;
+      border-radius:50%;background:var(--accent);display:none;align-items:center;justify-content:center
+    }
+    .design-card.selected .check{display:flex}
+    .design-card .check::after{content:'';width:10px;height:5px;border-left:2px solid var(--bg);border-bottom:2px solid var(--bg);transform:rotate(-45deg) translateY(-1px)}
+    /* Actions */
+    .actions{display:flex;gap:12px;margin-top:20px}
+    .actions .btn-primary{flex:1}
+    /* Loading */
+    .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading-state{text-align:center;padding:60px 20px;color:var(--text-muted)}
+    .loading-state h3{color:var(--text);margin-bottom:8px;font-size:1.1rem}
+    .loading-state p{font-size:0.9rem}
+    /* Messages */
+    .error{color:var(--error);font-size:0.85rem;margin-top:8px}
+    .success{color:var(--success);font-size:0.85rem;margin-top:8px}
+    .info{color:var(--text-muted);font-size:0.8rem;margin-top:8px}
+    /* Hidden */
+    .hidden{display:none!important}
+    /* Responsive */
+    @media(max-width:640px){.form-grid{grid-template-columns:1fr}.design-gallery{grid-template-columns:1fr}.container{padding:12px}}
+    /* Prompt examples */
+    .prompt-examples{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+    .prompt-examples button{
+      background:var(--bg-elevated);border:1px solid var(--border);border-radius:20px;
+      padding:6px 14px;font-size:0.8rem;color:var(--text-muted);cursor:pointer;transition:all 0.2s;font-family:inherit
+    }
+    .prompt-examples button:hover{color:var(--accent);border-color:var(--accent)}
+    /* Regenerations counter */
+    .regens{font-size:0.8rem;color:var(--text-muted);text-align:center;margin-top:12px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">GUANCHE<span>WEAR</span></div>
+    <nav>
+      <a href="/">Inicio</a>
+      <a href="/diseno">Crear diseño</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <!-- Step indicator -->
+    <div class="steps" id="stepIndicator">
+      <div class="step active" data-step="1">
+        <div class="step-num">1</div>
+        <span class="step-label">Elige tu prenda</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" data-step="2">
+        <div class="step-num">2</div>
+        <span class="step-label">Describe tu idea</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step" data-step="3">
+        <div class="step-num">3</div>
+        <span class="step-label">Elige y compra</span>
+      </div>
+    </div>
+
+    <!-- Step 1: Product Selection -->
+    <div id="step1" class="form-section">
+      <h2>1. Elige tu prenda</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Tipo de prenda</label>
+          <select id="productType">
+            <option value="t-shirt">Camiseta — 25€</option>
+            <option value="hoodie">Sudadera — 35€</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Talla (EU)</label>
+          <select id="size">
+            <option value="S">S</option>
+            <option value="M" selected>M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+            <option value="XXL">XXL</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Color</label>
+          <select id="color">
+            <option value="black">Negro</option>
+            <option value="white">Blanco</option>
+            <option value="navy">Azul marino</option>
+            <option value="grey">Gris</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="goToStep(2)" style="margin-top:16px">Continuar →</button>
+    </div>
+
+    <!-- Step 2: Design Description -->
+    <div id="step2" class="form-section hidden">
+      <h2>2. Describe tu diseño ideal</h2>
+      <div class="form-group full">
+        <label>¿Qué quieres que aparezca en tu prenda?</label>
+        <textarea id="description" rows="3" placeholder="Ej: un lobo aullando a la luna llena en un bosque nocturno, estilo minimalista, colores vibrantes..."></textarea>
+        <div class="prompt-examples">
+          <button onclick="document.getElementById('description').value='Un león geométrico dorado sobre fondo negro, estilo tribal moderno'">🦁 León dorado</button>
+          <button onclick="document.getElementById('description').value='Una palmera al atardecer con colores neón, estilo retro ochentero'">🌴 Palmera retro</button>
+          <button onclick="document.getElementById('description').value='Un dragón minimalista en espiral, tinta negra, estilo japonés'">🐉 Dragón japonés</button>
+          <button onclick="document.getElementById('description').value='Letras góticas que formen GUANCHE con detalles dorados'">✍️ Lettering</button>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="generarDiseno()" id="generateBtn">✨ Generar mi diseño</button>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="form-section hidden">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <h3>Nuestro artista IA está trabajando...</h3>
+        <p>Analizando tu idea y creando diseños exclusivos para ti</p>
+      </div>
+    </div>
+
+    <!-- Step 3: Design Gallery -->
+    <div id="step3" class="form-section hidden">
+      <h2>3. Elige tu diseño favorito</h2>
+      <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:16px">
+        Cada diseño es único y generado exclusivamente para ti
+      </p>
+      <div class="design-gallery" id="designGallery"></div>
+      <div class="regens" id="regensInfo"></div>
+      <div class="actions">
+        <button class="btn-secondary" onclick="regenerarDiseno()" id="regenerateBtn">🔄 Regenerar</button>
+        <button class="btn-primary" onclick="irAPagar()" id="confirmBtn" disabled>Confirmar y comprar — 25€</button>
+      </div>
+      <div id="messages"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentToken = '';
+    let selectedIndex = -1;
+    let currentStep = 1;
+
+    function goToStep(n) {
+      for (let i = 1; i <= 3; i++) {
+        document.getElementById('step' + i).classList.add('hidden');
+        const step = document.querySelector(`[data-step="${i}"]`);
+        step.classList.remove('active');
+        if (i < n) step.classList.add('completed');
+      }
+      document.getElementById('step' + n).classList.remove('hidden');
+      document.querySelector(`[data-step="${n}"]`).classList.add('active');
+      currentStep = n;
+    }
+
+    async function generarDiseno() {
+      const description = document.getElementById('description').value.trim();
+      if (!description) {
+        document.getElementById('description').focus();
+        document.getElementById('description').style.borderColor = '#EF4444';
+        return;
+      }
+
+      document.getElementById('step2').classList.add('hidden');
+      document.getElementById('loading').classList.remove('hidden');
+
+      try {
+        const res = await fetch('/api/crear-diseno', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            product_type: document.getElementById('productType').value,
+            size: document.getElementById('size').value,
+            color: document.getElementById('color').value,
+            description
+          })
+        });
+
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        currentToken = data.token;
+        mostrarDisenos(data.imagenes, data.regeneraciones_restantes);
+      } catch (e) {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('step2').classList.remove('hidden');
+        document.getElementById('messages').innerHTML = `<div class="error">${e.message}</div>`;
+      }
+    }
+
+    function mostrarDisenos(imagenes, regens) {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('step3').classList.remove('hidden');
+
+      const gallery = document.getElementById('designGallery');
+      gallery.innerHTML = '';
+
+      imagenes.forEach((url, i) => {
+        const card = document.createElement('div');
+        card.className = 'design-card';
+        card.innerHTML = `
+          <div class="badge">Diseño ${i + 1}</div>
+          <div class="check"></div>
+          <img src="${url}" alt="Diseño ${i + 1}" loading="lazy">
+        `;
+        card.onclick = () => seleccionarDiseno(i);
+        gallery.appendChild(card);
+      });
+
+      const precio = document.getElementById('productType').value === 'hoodie' ? '35' : '25';
+      document.getElementById('confirmBtn').textContent = `Confirmar y comprar — ${precio}€`;
+      document.getElementById('regensInfo').textContent = regens > 0
+        ? `Te quedan ${regens} regeneraciones`
+        : 'Has agotado tus regeneraciones';
+
+      document.getElementById('regenerateBtn').disabled = regens <= 0;
+      goToStep(3);
+    }
+
+    function seleccionarDiseno(index) {
+      selectedIndex = index;
+      document.querySelectorAll('.design-card').forEach((c, i) => {
+        c.classList.toggle('selected', i === index);
+      });
+      document.getElementById('confirmBtn').disabled = false;
+    }
+
+    async function regenerarDiseno() {
+      const description = document.getElementById('description').value.trim();
+
+      document.getElementById('step3').classList.add('hidden');
+      document.getElementById('loading').classList.remove('hidden');
+
+      try {
+        const res = await fetch('/api/regenerar-diseno', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: currentToken, description: description || undefined })
+        });
+
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        selectedIndex = -1;
+        mostrarDisenos(data.imagenes, data.regeneraciones_restantes);
+      } catch (e) {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('step3').classList.remove('hidden');
+        document.getElementById('messages').innerHTML = `<div class="error">${e.message}</div>`;
+      }
+    }
+
+    async function irAPagar() {
+      if (selectedIndex < 0) return;
+
+      document.getElementById('confirmBtn').disabled = true;
+      document.getElementById('confirmBtn').textContent = 'Preparando pago...';
+
+      try {
+        const res = await fetch('/api/crear-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: currentToken, designIndex: selectedIndex })
+        });
+
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        // Redirigir a Stripe
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          // Stripe Checkout con redirect
+          const stripe = Stripe('pk_live_51U05rVJ3pN3YzoSq8ZxSkO5miXppPEW0sUdlIipdAVUdHY4tAb2GAOvcRhpygAXVemgeSxp8klqqRm1eT36u1lzj007P1IcKdA');
+          const { error } = await stripe.redirectToCheckout({ sessionId: data.id });
+          if (error) throw new Error(error.message);
+        }
+      } catch (e) {
+        document.getElementById('messages').innerHTML = `<div class="error">${e.message}</div>`;
+        document.getElementById('confirmBtn').disabled = false;
+        document.getElementById('confirmBtn').textContent = 'Confirmar y comprar';
+      }
+    }
+
+    // Enter en textarea genera
+    document.getElementById('description').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        generarDiseno();
+      }
+    });
+  </script>
+  <script src="https://js.stripe.com/v3/"></script>
+</body>
+</html>
