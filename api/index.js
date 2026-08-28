@@ -62,13 +62,28 @@ async function refinarPrompt(descripcion) {
 // ─── DALL-E 3: Generar imágenes ───
 
 async function generarImagenes(prompt, n = 2) {
+  // Try local FLUX server first
+  const fluxUrl = process.env.FLUX_SERVER_URL;
+  if (fluxUrl) {
+    try {
+      const response = await axios.post(`${fluxUrl}/generate`, {
+        prompt: prompt,
+        num_images: n,
+        width: 768,
+        height: 768
+      }, { timeout: 30000 });
+      return response.data.images;
+    } catch (err) {
+      console.log('FLUX server unavailable, falling back to OpenAI:', err.message);
+    }
+  }
+  // Fallback: OpenAI gpt-image-1
   const response = await openai.images.generate({
     model: 'gpt-image-1',
     prompt: prompt,
     n: n,
     size: '1024x1024'
   });
-  // gpt-image-1 returns base64, convert to data URL
   return response.data.map(img => `data:image/png;base64,${img.b64_json}`);
 }
 
@@ -142,16 +157,18 @@ async function crearOrdenPrintify(variantId, fileId, email, externalId) {
   return orderResp.data.id;
 }
 
+const PUBLIC_DIR = path.join(__dirname, '..', 'public');
+
 // ─── Servir frontend ───
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/public/index.html');
+  res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
 });
 
 // ─── Página de diseño (post-pago) ───
 
 app.get('/diseno', (req, res) => {
-  res.sendFile(__dirname + '/public/diseno.html');
+  res.sendFile(path.join(PUBLIC_DIR, 'diseno.html'));
 });
 
 // ─── API: Crear diseño (SIN pago) ───

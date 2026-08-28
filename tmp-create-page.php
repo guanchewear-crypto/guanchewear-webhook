@@ -1,10 +1,12 @@
 <?php
 /**
- * Plugin Name: GW Create Page
+ * Plugin Name: GuancheWear Page Creator
+ * Description: Creates the /crear page for the design tool
  * Version: 1.0
  */
-function gw_create_diseno_page() {
-    if (!get_page_by_path('crear')) {
+function gw_create_pages() {
+    $page = get_page_by_path('crear');
+    if (!$page) {
         wp_insert_post(array(
             'post_title' => 'Crear tu diseño',
             'post_name' => 'crear',
@@ -14,4 +16,4 @@ function gw_create_diseno_page() {
         ));
     }
 }
-add_action('init', 'gw_create_diseno_page');
+add_action('init', 'gw_create_pages');
