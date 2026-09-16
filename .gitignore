@@ -1,1 +1,12 @@
+node_modules
 .vercel
+__pycache__/
+*.pyc
+
+# Secretos: nunca versionar
+.env
+.env.*
+!.env.example
+
+# Adjuntos temporales del escritorio de Hermes
+.hermes/desktop-attachments/
