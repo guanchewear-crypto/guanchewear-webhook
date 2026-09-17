@@ -135,25 +135,39 @@ def verify_encryption(backup: Path) -> None:
 
     recorded = sums.read_text(encoding="utf-8").split()
     check("plaintext checksum file is well formed", len(recorded) == 2 and bool(re.fullmatch(r"[0-9a-f]{64}", recorded[0])))
-    passphrase = keyfile.read_text(encoding="utf-8").splitlines()[3].strip()
+    lines = keyfile.read_text(encoding="utf-8").splitlines()
+    passphrase = lines[0].strip() if lines else ""
+    # `openssl -pass file:` reads the FIRST line, so that line must be the key.
+    # A human-readable header here made the documented restore command read
+    # "Passphrase for ..." as the key: it could never work, and this verifier
+    # did not notice because it decrypted through the environment instead.
+    check("key file is the passphrase alone", len(lines) == 1, f"{len(lines)} lines")
     check("passphrase has real entropy", len(passphrase) >= 30, f"length {len(passphrase)}")
 
-    def decrypt(pass_value: str, dest: Path) -> None:
+    def decrypt(key_source: str, dest: Path) -> None:
         subprocess.run(
             ["openssl", "enc", "-d", "-aes-256-cbc", "-pbkdf2", "-iter", "600000",
-             "-pass", "env:GW_BACKUP_PASSPHRASE", "-in", archive.as_posix(), "-out", dest.as_posix()],
-            env={**os.environ, "GW_BACKUP_PASSPHRASE": pass_value}, capture_output=True, text=True, timeout=900,
+             "-pass", key_source, "-in", archive.as_posix(), "-out", dest.as_posix()],
+            capture_output=True, text=True, timeout=900,
         )
 
     with tempfile.TemporaryDirectory(prefix="hermes-tooling-dec-") as tmp:
         good = Path(tmp) / "good.tar.gz"
-        decrypt(passphrase, good)
-        check("decrypted tarball matches the recorded hash", sha256(good) == recorded[0],
+        # Exercise the documented command, not a private re-implementation.
+        decrypt(f"file:{keyfile.as_posix()}", good)
+        check("documented decrypt command restores the plaintext", sha256(good) == recorded[0],
               f"expected {recorded[0][:12]} got {sha256(good)[:12]}")
         bad = Path(tmp) / "bad.tar.gz"
-        decrypt("wrong-passphrase", bad)
+        decrypt("pass:wrong-passphrase", bad)
         # AES-CBC is unauthenticated: the checksum is the only gate.
         check("wrong passphrase is detected by the checksum", sha256(bad) != recorded[0], "wrong key matched")
+
+    # The documented recovery path is the script, so run it end to end.
+    restore = Path(__file__).with_name("restore-backup.py")
+    result = subprocess.run([sys.executable, str(restore), archive.as_posix(), "--list"],
+                            capture_output=True, text=True, timeout=900)
+    check("restore-backup.py reads the backup", result.returncode == 0 and "RESTORE_OK" in result.stdout,
+          (result.stdout.strip() or result.stderr.strip())[-140:])
 
 
 def verify_upload_guard() -> None:

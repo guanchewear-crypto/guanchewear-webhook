@@ -14,8 +14,11 @@ taken from GW_BACKUP_PASSPHRASE, otherwise a strong one is generated and
 written next to the archive.
 
 Decrypt:
+    python scripts/restore-backup.py <file>.tar.gz.enc
+
+    Or by hand (the key file holds the passphrase alone, first line):
     openssl enc -d -aes-256-cbc -pbkdf2 -iter 600000 \\
-      -pass file:PASSPHRASE.txt -in <file>.enc -out backup.tar.gz
+      -pass file:<file>.PASSPHRASE.txt -in <file>.tar.gz.enc -out backup.tar.gz
     sha256sum -c <file>.tar.gz.sha256    # MUST pass: AES-CBC cannot detect a
                                          # wrong passphrase, it returns garbage
     tar -xzf backup.tar.gz
@@ -97,15 +100,12 @@ def main() -> int:
             print(f"ENCRYPT_FAILED  openssl: {result.stderr.strip()}", file=sys.stderr)
             return 1
 
+    # The key file holds the passphrase alone, on the first line: `openssl -pass
+    # file:` reads that line and nothing else, so a human-readable header would
+    # silently become the key and the documented restore command would never
+    # work. The warning lives in the printed output instead.
     keyfile = dest.with_name(dest.name.replace(".tar.gz.enc", "") + ".PASSPHRASE.txt")
-    keyfile.write_text(
-        "Passphrase for " + dest.name + "\n"
-        "========================================\n\n"
-        + passphrase + "\n\n"
-        "Guardala en tu gestor de contrasenas y BORRA este archivo.\n"
-        "Sin ella el backup cifrado es irrecuperable.\n",
-        encoding="utf-8", newline="\n",
-    )
+    keyfile.write_text(passphrase + "\n", encoding="utf-8", newline="\n")
 
     sums = dest.with_name(dest.name.replace(".tar.gz.enc", ".tar.gz.sha256"))
     sums.write_text(f"{raw_sha}  {backup.name}.tar.gz\n", encoding="utf-8", newline="\n")
@@ -120,7 +120,8 @@ def main() -> int:
           f" ({len(passphrase)} chars)")
     print()
     print("ENCRYPT_OK")
-    print(f"  decrypt: openssl enc -d -aes-256-cbc -pbkdf2 -iter {ITERATIONS} "
+    print(f"  restore: python scripts/restore-backup.py {dest.name}")
+    print(f"  manual : openssl enc -d -aes-256-cbc -pbkdf2 -iter {ITERATIONS} "
           f"-pass file:{keyfile.name} -in {dest.name} -out {backup.name}.tar.gz")
     print(f"  verify : sha256sum -c {sums.name}   # obligatorio antes de extraer")
     print("  AVISO: mueve la passphrase a tu gestor de claves y borra el archivo .txt")
