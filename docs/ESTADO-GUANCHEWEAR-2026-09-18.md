@@ -5,10 +5,10 @@ volcados de base de datos, passphrases ni backups cifrados.
 
 ## Repositorios de código
 
-| Componente | Repositorio | Rama | Commit verificado |
+| Componente | Repositorio | Rama | Último commit de código verificado |
 |---|---|---|---|
-| Backend y tooling | `guanchewear-crypto/guanchewear-webhook` | `feat/redesign-premium` | `dea7333` |
-| Landing React/Vite | `guanchewear-crypto/guanchewear-BACKUPS-WEB` | `master` | `7132bc7` |
+| Backend y tooling | `guanchewear-crypto/guanchewear-webhook` | `feat/redesign-premium` | `f2b7590` |
+| Landing React/Vite | `guanchewear-crypto/guanchewear-BACKUPS-WEB` | `master` | `3a982d6` |
 
 El frontend está declarado como submódulo `guanchewear-landing` del backend.
 Los dos commits coinciden con sus respectivos remotos de GitHub.
@@ -24,9 +24,13 @@ Los dos commits coinciden con sus respectivos remotos de GitHub.
 - Galería con 16 fichas 4:3, dos por fila en desktop y sin celdas vacías.
 - Mapa de origen con geometría real de Canarias y Europa.
 - Identidad visual intacta: fondo `#0A0A0A`, dorado `#D4A853`, texto `#F5F5F5`.
-- La animación de micro partículas doradas solicitada **todavía no está implementada**.
-  La ejecución se interrumpió durante la inspección previa y no se modificó código
-  de la landing para ese efecto.
+- Atmósfera animada dorada integrada desde `#colecciones` hasta el CTA final,
+  con Canvas 2D nativo, halos radiales, partículas adaptativas, parallax limitado
+  y soporte para `prefers-reduced-motion`.
+- Corregido el `position: sticky` de la sección de colecciones: la capa de
+  partículas ya no sobrescribe la posición del viewport horizontal y desaparece
+  el hueco negro antes de «Nuestro método».
+- Checkpoint de código GitHub: frontend `3a982d6`.
 
 ## Staging
 
@@ -74,7 +78,8 @@ cd "C:/Users/Usuario/guanchewear-webhook/guanchewear-landing"
 npm run verify
 ```
 
-El último estado confirmado del frontend fue `npm run verify` con exit 0.
+El último estado confirmado del frontend fue `npm run verify` con exit 0 después
+de la integración de partículas y la corrección del sticky.
 
 Backend/tooling:
 
@@ -91,7 +96,6 @@ comprueba SHA256 antes de extraer y se niega a continuar si el hash no coincide.
 - Elegir y crear el staging remoto.
 - Migrar el SQL y el maestro WordPress en staging.
 - Validar páginas, imágenes, WooCommerce, formularios y consola del navegador.
-- Implementar únicamente la capa sutil de micro partículas, después de aprobar el
-  staging y sin alterar estructura, tipografías, colores, tamaños ni composición.
+- Validar el checkpoint visual en staging remoto antes de promocionarlo.
 - Pasar la passphrase a un gestor de contraseñas y eliminar su archivo local.
 - Sustituir cualquier credencial histórica del remoto git por un credential helper.
