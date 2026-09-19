@@ -7,8 +7,8 @@ volcados de base de datos, passphrases ni backups cifrados.
 
 | Componente | Repositorio | Rama | Último commit de código verificado |
 |---|---|---|---|
-| Backend y tooling | `guanchewear-crypto/guanchewear-webhook` | `feat/redesign-premium` | `f2b7590` |
-| Landing React/Vite | `guanchewear-crypto/guanchewear-BACKUPS-WEB` | `master` | `3a982d6` |
+| Backend y tooling | `guanchewear-crypto/guanchewear-webhook` | `feat/redesign-premium` | `1efca53` |
+| Landing React/Vite | `guanchewear-crypto/guanchewear-BACKUPS-WEB` | `master` | `8e447cc` |
 
 El frontend está declarado como submódulo `guanchewear-landing` del backend.
 Los dos commits coinciden con sus respectivos remotos de GitHub.
@@ -30,7 +30,7 @@ Los dos commits coinciden con sus respectivos remotos de GitHub.
 - Corregido el `position: sticky` de la sección de colecciones: la capa de
   partículas ya no sobrescribe la posición del viewport horizontal y desaparece
   el hueco negro antes de «Nuestro método».
-- Checkpoint de código GitHub: frontend `3a982d6`.
+- Checkpoint de código GitHub: frontend `8e447cc`.
 
 ## Staging
 
@@ -70,6 +70,22 @@ Estos archivos contienen datos del sitio y no deben publicarse sin cifrar.
 El repositorio no incluye el paquete, la base de datos, el `.env` ni la passphrase.
 
 ## Verificación
+
+Medición Lighthouse local posterior a las correcciones de accesibilidad y SEO:
+
+| Entorno | Performance | Accessibility | Best Practices | SEO |
+|---|---:|---:|---:|---:|
+| Vite preview, móvil | 100 | 100 | 100 | 100 |
+| Vite preview, escritorio | 100 | 100 | 100 | 100 |
+| `https://guanchewear.es/` actual | 100 | 100 | 100 | 69 |
+
+La producción mantiene `noindex,nofollow`, por lo que su SEO no puede subir hasta
+que se habilite indexación en staging/prod de forma explícita. También presenta un
+TTFB medido de unos 710 ms y caché corta gestionada por WordPress/hosting.
+
+Google Analytics no está conectado en el frontend: no se encontró Measurement ID,
+`gtag` ni Google Tag Manager. No se añadieron credenciales ni un ID inventado.
+Para usar datos de comportamiento reales hay que conectar la propiedad GA4.
 
 Frontend:
 
